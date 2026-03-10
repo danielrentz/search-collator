@@ -8,7 +8,7 @@ Class [`Intl.Segmenter`][2] will be used to split all strings into grapheme clus
 ## Example
 
 ```ts
-import { SearchCollator } from 'indexof-collator'
+import { SearchCollator } from 'search-collator'
 
 const collator = new SearchCollator('de', { sensitivity: 'base', ignorePunctuation: true })
 
