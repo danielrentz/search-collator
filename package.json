@@ -1,6 +1,6 @@
 {
   "name": "search-collator",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Extensions for Intl.Collator for locale-aware searching in strings (findMatches, findMatch, indexOf, includes, startsWith).",
   "keywords": [
     "intl",
