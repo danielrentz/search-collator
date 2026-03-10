@@ -62,7 +62,7 @@ export default defineConfig([
     files: ['test/**.test.*'],
     extends: [vitest.configs.recommended],
     rules: {
-      'vitest/expect-expect': ['error', { assertFunctionNames: 'expect*' }],
+      'vitest/expect-expect': ['error', { assertFunctionNames: ['expect*'] }],
     },
   },
 ])
