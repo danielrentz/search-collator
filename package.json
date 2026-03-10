@@ -1,0 +1,53 @@
+{
+  "name": "search-collator",
+  "version": "1.0.0",
+  "description": "Extensions for Intl.Collator for locale-aware searching in strings (findMatches, findMatch, indexOf, includes, startsWith).",
+  "keywords": [
+    "intl",
+    "collator",
+    "indexof",
+    "includes",
+    "startswith"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danielrentz/search-collator.git"
+  },
+  "homepage": "https://github.com/danielrentz/search-collator#readme",
+  "bugs": {
+    "url": "https://github.com/danielrentz/search-collator/issues"
+  },
+  "author": "Daniel Rentz <daniel.rentz@gmx.de>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  },
+  "files": [
+    "CHANGELOG.md",
+    "dist/",
+    "!dist/*.tsbuildinfo"
+  ],
+  "scripts": {
+    "build": "npm run clean && tsc --build",
+    "clean": "premove dist",
+    "coverage": "vitest run --coverage",
+    "lint": "eslint .",
+    "prepack": "npm run build && npm run lint && npm run test",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@stylistic/eslint-plugin": "^5.9.0",
+    "@types/node": "^25.3.0",
+    "@vitest/coverage-v8": "^4.0.18",
+    "@vitest/eslint-plugin": "^1.6.9",
+    "eslint": "^10.0.2",
+    "premove": "^4.0.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.1",
+    "vitest": "^4.0.15"
+  }
+}
