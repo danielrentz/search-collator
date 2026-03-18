@@ -294,7 +294,7 @@ export class SearchCollator extends Intl.Collator {
    * Iterates through the grapheme clusters of a string. Skips punctuation if
    * configured in this collator.
    */
-  * #visitSignificantGraphemes(text: string): IterableIterator<Intl.SegmentData, undefined> {
+  *#visitSignificantGraphemes(text: string): IterableIterator<Intl.SegmentData, undefined> {
     const { locale, ignorePunctuation } = this.resolvedOptions()
     const segmenter = new Intl.Segmenter(locale, { granularity: 'grapheme' })
     for (const data of segmenter.segment(text)) {
@@ -316,7 +316,7 @@ export class SearchCollator extends Intl.Collator {
    * Yields the number of grapheme clusters to match in a text according to the
    * number of grapheme clusters in a query text.
    */
-  * #yieldMatchGraphemeCounts(query: number): IterableIterator<number> {
+  *#yieldMatchGraphemeCounts(query: number): IterableIterator<number> {
     // first try to match the same amount of grapheme clusters in the text
     yield query
     // try less grapheme clusters and more grapheme clusters, increase distance in both directions simultaneously
@@ -330,7 +330,7 @@ export class SearchCollator extends Intl.Collator {
    * Yields the positions of all matching substrings in a text according to the
    * settings of this collator. Supports the option 'ignorePunctuation'.
    */
-  * #findSlices(text: string, query: string, start = 0, single = false): CollatorMatchIterator {
+  *#findSlices(text: string, query: string, start = 0, single = false): CollatorMatchIterator {
     // split 'query' into grapheme clusters that will be used to find a match in 'text'
     const queryGraphemeCount = query ? this.#countSignificantGraphemes(query) : 0
 
@@ -397,7 +397,7 @@ export class SearchCollator extends Intl.Collator {
       const match = findMatch(graphemeIdx)
       if (match) yield match
       // keep the 'graphemes' array short while searching in very long strings
-      if (graphemeIdx === 100) positions.splice(graphemeIdx = 0, 100)
+      if (graphemeIdx === 100) positions.splice((graphemeIdx = 0), 100)
     }
   }
 }

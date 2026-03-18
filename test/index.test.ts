@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { type CollatorMatch, type SearchCollatorOptions, SearchCollator } from '../src/index.js'
 
 function printValue(value: unknown): string {
-  return (typeof value === 'string') ? `'${value}'` : String(value)
+  return typeof value === 'string' ? `'${value}'` : String(value)
 }
 
 function printSignature(args: unknown[], options: SearchCollatorOptions): string {
@@ -14,7 +14,7 @@ type Pos = readonly [number, number]
 type PosSpec = Pos | number
 
 function toPos(pos: PosSpec): Pos {
-  return (typeof pos === 'number') ? [pos, pos] : pos
+  return typeof pos === 'number' ? [pos, pos] : pos
 }
 
 function toMatch(text: string, pos: PosSpec): CollatorMatch {
@@ -77,7 +77,7 @@ const MATCH_TESTS: MatchTestSpec[] = [
 
 function expectAllLookupMethods(locales: Intl.LocalesArgument, options: SearchCollatorOptions, args: [text: string, query: string, start?: number], expected: PosSpec[]): void {
   const collator = new SearchCollator(locales, options)
-  const matches = expected.map(pos => toMatch(args[0], pos))
+  const matches = expected.map((pos) => toMatch(args[0], pos))
   const match0 = matches[0]
   const signature = printSignature(args, options)
   expect(Array.from(collator.findMatches(...args)), `collator.findMatches${signature}`).toStrictEqual(matches)
@@ -132,7 +132,7 @@ it('should work when shortening grapheme cluster cache', () => {
   const collator = new SearchCollator('de', { sensitivity: 'base' })
   const text = `ee${'a'.repeat(96)}eeee${'a'.repeat(96)}eeee`
   const result = Array.from(collator.findMatches(text, 'éé'))
-  expect(result).toStrictEqual([0, 98, 99, 100, 198, 199, 200].map(idx => toMatch(text, [idx, idx + 2])))
+  expect(result).toStrictEqual([0, 98, 99, 100, 198, 199, 200].map((idx) => toMatch(text, [idx, idx + 2])))
 })
 
 // ----------------------------------------------------------------------------
@@ -140,7 +140,7 @@ it('should work when shortening grapheme cluster cache', () => {
 describe('should find match at start of text', () => {
   it.for(MATCH_TESTS)('case %s', ([, locales, options, text, query, expected]) => {
     const collator = new SearchCollator(locales, options)
-    const matches = expected.map(pos => toMatch(text, pos))
+    const matches = expected.map((pos) => toMatch(text, pos))
     const match0 = matches[0]
     const signature = printSignature([text, query], options)
     expect(collator.startsWith(text, query), `collator.startsWith${signature}`).toBe(match0?.start === 0)

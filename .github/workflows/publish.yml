@@ -6,14 +6,14 @@ on:
       - 'v*' # publish when pushing a tag starting with 'v'
 
 permissions:
-  id-token: write  # required for OIDC
+  id-token: write # required for OIDC
   contents: read
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: actions/setup-node@v6
         with:
