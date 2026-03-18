@@ -5,14 +5,10 @@
   "include": ["./*.ts"],
 
   // https://www.typescriptlang.org/tsconfig/#references
-  "references": [
-    { "path": "./src" },
-    { "path": "./test" },
-  ],
+  "references": [{ "path": "./src" }, { "path": "./test" }],
 
   // https://www.typescriptlang.org/tsconfig/#compiler-options
   "compilerOptions": {
-
     // type checking
     "exactOptionalPropertyTypes": true,
     "noFallthroughCasesInSwitch": true,
@@ -38,6 +34,6 @@
 
     // language and environment
     "lib": ["ESNext"],
-    "target": "esnext",
-  },
+    "target": "esnext"
+  }
 }

@@ -3,11 +3,14 @@
   "version": "1.0.0",
   "description": "Extensions for Intl.Collator for locale-aware searching in strings (findMatches, findMatch, indexOf, includes, startsWith).",
   "keywords": [
+    "case-insensitive",
     "collator",
     "find",
     "includes",
     "indexof",
     "intl",
+    "locale",
+    "punctuation",
     "search",
     "startswith"
   ],

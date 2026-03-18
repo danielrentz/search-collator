@@ -11,6 +11,6 @@
     "declaration": true,
     "declarationMap": true,
     "isolatedDeclarations": true,
-    "outDir": "../dist",
-  },
+    "outDir": "../dist"
+  }
 }
