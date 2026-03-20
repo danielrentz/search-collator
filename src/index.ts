@@ -4,23 +4,23 @@
 export interface SearchCollatorOptions extends Intl.CollatorOptions {
   /**
    * The maximum length difference of grapheme cluster sequences to be
-   * extracted from the search text and compared with the query text.
+   * extracted from the input text and compared with the query text.
    *
    * When searching for a substring match, the search algorithm will extract
-   * substring candidates with different grapheme cluster counts from the
-   * search text and will compare them with the query string. This option
-   * specifies the lower and upper limit for the lengths of these candidates
-   * relative to the number of grapheme clusters in the query string.
+   * substring candidates with different grapheme cluster counts from the input
+   * text and will compare them with the query string. This option specifies
+   * the lower and upper limit for the lengths of these candidates relative to
+   * the number of grapheme clusters in the query string.
    *
    * _Note:_ The higher this number, the slower the search algorithm will run.
    *
    * _Example:_ The query text contains 5 grapheme clusters. With this option
    * set to `2`, the search algorithm extracts substrings with 3, 4, 5, 6, and
-   * 7 grapheme clusters for every grapheme cluster in the search text.
+   * 7 grapheme clusters for every grapheme cluster in the input text.
    *
    * _Example:_ Using the collator option `numeric: true`, this option set to
    * `2`, and the query text `'1'` (one grapheme cluster), the search algorithm
-   * will find a match for `'1'`, `'01'`, and `'001'` in the search text (up to
+   * will find a match for `'1'`, `'01'`, and `'001'` in the input text (up to
    * three grapheme clusters), but not for `'0001'` (four grapheme clusters).
    *
    * _Example:_ With this option set to `1`, and using German locale, the
@@ -58,7 +58,7 @@ export interface CollatorMatch {
 /**
  * An iterator for `CollatorMatch` objects.
  */
-export type CollatorMatchIterator = IterableIterator<CollatorMatch, undefined>
+export type CollatorMatchIterator = IteratorObject<CollatorMatch, undefined>
 
 /**
  * Extends the [`Intl.Collator`](https://devdocs.io/javascript/global_objects/intl/collator)
@@ -98,21 +98,21 @@ export class SearchCollator extends Intl.Collator {
 
   /**
    * Returns an iterator yielding the content and positions of all occurrences
-   * of a substring in another string according to this collator's locale and
+   * of a substring in the input text according to this collator's locale and
    * options.
    *
-   * @param text
-   *  The string to search the specified substring in.
+   * @param input
+   *  The input text to search the substring in.
    *
    * @param query
-   *  The substring to be searched in the specified string.
+   *  The substring to be searched in the input text.
    *
    * @param start
-   *  The index in the search string to start searching at. Default is `0`.
+   *  The index in the input text to start searching at. Default is `0`.
    *
    * @returns
    *  An iterator yielding the content and positions of all occurrences of the
-   *  query string in the search text.
+   *  query string in the input text.
    *
    * @example
    *  const collator = new Collator('en', { sensitivity: 'base', ignorePunctuation: true })
@@ -122,29 +122,26 @@ export class SearchCollator extends Intl.Collator {
    *    // { text: 'À.b', start: 12, end: 15 }
    *  }
    */
-  findMatches(text: string, query: string, start?: number): CollatorMatchIterator {
-    return this.#findSlices(text, query, start)
+  findMatches(input: string, query: string, start?: number): CollatorMatchIterator {
+    return this.#findSlices(input, query, start)
   }
 
   /**
    * Returns the content and position of the first occurrence of a substring in
-   * another string according to this collator's locale and options.
+   * the input text according to this collator's locale and options.
    *
-   * @param text
-   *  The string to search the specified substring in.
+   * @param input
+   *  The input text to search the substring in.
    *
    * @param query
-   *  The substring to be searched in the specified string.
+   *  The substring to be searched in the input text.
    *
    * @param start
-   *  The index in the search string to start searching at. Default is `0`.
-   *
-   * @param start
-   *  The index in the search string to start searching at. Default is `0`.
+   *  The index in the input text to start searching at. Default is `0`.
    *
    * @returns
    *  The content and position of the first occurrence of the query string in
-   *  the search text.
+   *  the input text.
    *
    * @example
    *  const collator = new Collator('en', { sensitivity: 'base', ignorePunctuation: true })
@@ -153,25 +150,25 @@ export class SearchCollator extends Intl.Collator {
    *  collator.findMatch('c.b.á.b.c', 'AB', 6)  // undefined
    *  collator.findMatch('c.b.á.b.c', 'ac')     // undefined
    */
-  findMatch(text: string, query: string, start?: number): CollatorMatch | undefined {
-    return this.#findSlices(text, query, start).next().value
+  findMatch(input: string, query: string, start?: number): CollatorMatch | undefined {
+    return this.#findSlices(input, query, start).next().value
   }
 
   /**
-   * Returns the character index of the first occurrence of a substring in
-   * another string according to this collator's locale and options.
+   * Returns the character index of the first occurrence of a substring in the
+   * input text according to this collator's locale and options.
    *
-   * @param text
-   *  The string to search the specified substring in.
+   * @param input
+   *  The input text to search the substring in.
    *
    * @param query
-   *  The substring to be searched in the specified string.
+   *  The substring to be searched in the input text.
    *
    * @param start
-   *  The index in the search string to start searching at. Default is `0`.
+   *  The index in the input text to start searching at. Default is `0`.
    *
    * @returns
-   *  The index of the first occurrence of the query string in the search text.
+   *  The index of the first occurrence of the query string in the input text.
    *
    * @example
    *  const collator = new Collator('en', { sensitivity: 'base', ignorePunctuation: true })
@@ -180,25 +177,25 @@ export class SearchCollator extends Intl.Collator {
    *  collator.indexOf('c.b.á.b.c', 'AB', 6)  // -1
    *  collator.indexOf('c.b.á.b.c', 'ac')     // -1
    */
-  indexOf(text: string, query: string, start?: number): number {
-    return this.#findSlices(text, query, start).next().value?.start ?? -1
+  indexOf(input: string, query: string, start?: number): number {
+    return this.#findSlices(input, query, start).next().value?.start ?? -1
   }
 
   /**
-   * Returns whether a substring is included in another string according to
+   * Returns whether a substring is included in the input text according to
    * this collator's locale and options.
    *
-   * @param text
-   *  The string to search the specified substring in.
+   * @param input
+   *  The input text to search the substring in.
    *
    * @param query
-   *  The substring to be searched in the specified string.
+   *  The substring to be searched in the input text.
    *
    * @param start
-   *  The index in the search string to start searching at. Default is `0`.
+   *  The index in the input text to start searching at. Default is `0`.
    *
    * @returns
-   *  Whether the query string is included in the search text.
+   *  Whether the query string is included in the input text.
    *
    * @example
    *  const collator = new Collator('en', { sensitivity: 'base', ignorePunctuation: true })
@@ -207,22 +204,22 @@ export class SearchCollator extends Intl.Collator {
    *  collator.includes('c.b.á.b.c', 'AB', 6)   // false
    *  collator.includes('c.b.á.b.c', 'ac')      // false
    */
-  includes(text: string, query: string, start?: number): boolean {
-    return !this.#findSlices(text, query, start).next().done
+  includes(input: string, query: string, start?: number): boolean {
+    return !this.#findSlices(input, query, start).next().done
   }
 
   /**
-   * Returns whether a string starts with a substring according to this
+   * Returns whether the input text starts with a substring according to this
    * collator's locale and options.
    *
-   * @param text
-   *  The string to search the specified substring in.
+   * @param input
+   *  The input text to search the substring in.
    *
    * @param query
-   *  The substring to be searched in the specified string.
+   *  The substring to be searched in the input text.
    *
    * @returns
-   *  Whether the search text starts with the query string.
+   *  Whether the input text starts with the query string.
    *
    * @example
    *  const collator = new Collator('en', { sensitivity: 'base', ignorePunctuation: true })
@@ -230,18 +227,18 @@ export class SearchCollator extends Intl.Collator {
    *  collator.startsWith('á.b.c', 'AB')  // true (match for 'á.b')
    *  collator.startsWith('á.b.c', 'bc')  // false
    */
-  startsWith(text: string, query: string): boolean {
-    return !this.#findSlices(text, query, 0, true).next().done
+  startsWith(input: string, query: string): boolean {
+    return !this.#findSlices(input, query, 0, true).next().done
   }
 
   /**
    * Returns whether two strings are equal according to this collator's locale
    * and options.
    *
-   * @param text1
+   * @param input1
    *  The first string to be compared with the second string.
    *
-   * @param text2
+   * @param input2
    *  The second string to be compared with the first string.
    *
    * @returns
@@ -253,8 +250,8 @@ export class SearchCollator extends Intl.Collator {
    *  collator.equals('á.b.c', 'ABC')   // true
    *  collator.equals('á.b.c', 'bc')    // false
    */
-  equals(text1: string, text2: string): boolean {
-    return !this.compare(text1, text2)
+  equals(input1: string, input2: string): boolean {
+    return !this.compare(input1, input2)
   }
 
   /**
@@ -265,7 +262,7 @@ export class SearchCollator extends Intl.Collator {
    * Useful to be passed into the array methods `filter()` and `find()`, as
    * well as similar functions processing string sequences.
    *
-   * @param text1
+   * @param input1
    *  The fixed string to be bound to the returned filter function.
    *
    * @returns
@@ -284,8 +281,8 @@ export class SearchCollator extends Intl.Collator {
    *  ['def', 'abc', '', 'á.b.c'].find(filter)          // 'abc'
    *  ['def', 'abc', '', 'á.b.c'].lastIndexOf(filter)   // 3
    */
-  filter(text1: string): (text2: string) => boolean {
-    return this.equals.bind(this, text1)
+  filter(input1: string): (input2: string) => boolean {
+    return this.equals.bind(this, input1)
   }
 
   // private ------------------------------------------------------------------
@@ -294,11 +291,22 @@ export class SearchCollator extends Intl.Collator {
    * Iterates through the grapheme clusters of a string. Skips punctuation if
    * configured in this collator.
    */
-  *#visitSignificantGraphemes(text: string): IterableIterator<Intl.SegmentData, undefined> {
+  *#visitSignificantGraphemes(text: string): Intl.SegmentIterator<Intl.SegmentData> {
+    // resolved collator options
     const { locale, ignorePunctuation } = this.resolvedOptions()
+
+    // create the iterator for the grapheme segments
     const segmenter = new Intl.Segmenter(locale, { granularity: 'grapheme' })
-    for (const data of segmenter.segment(text)) {
-      if (!ignorePunctuation || this.compare('', data.segment)) yield data
+    const segments = segmenter.segment(text)
+
+    // ignore punctuation grapheme clusters if configured
+    if (ignorePunctuation) {
+      for (const data of segments) {
+        // yield grapheme clusters that differ from empty string (i.e. not punctuation)
+        if (this.compare('', data.segment)) yield data
+      }
+    } else {
+      yield* segments
     }
   }
 
@@ -316,7 +324,7 @@ export class SearchCollator extends Intl.Collator {
    * Yields the number of grapheme clusters to match in a text according to the
    * number of grapheme clusters in a query text.
    */
-  *#yieldMatchGraphemeCounts(query: number): IterableIterator<number> {
+  *#yieldMatchGraphemeCounts(query: number): IteratorObject<number, undefined> {
     // first try to match the same amount of grapheme clusters in the text
     yield query
     // try less grapheme clusters and more grapheme clusters, increase distance in both directions simultaneously
@@ -327,16 +335,16 @@ export class SearchCollator extends Intl.Collator {
   }
 
   /**
-   * Yields the positions of all matching substrings in a text according to the
-   * settings of this collator. Supports the option 'ignorePunctuation'.
+   * Yields the positions of all matching substrings in an input text according
+   * to the settings of this collator. Supports the option 'ignorePunctuation'.
    */
-  *#findSlices(text: string, query: string, start = 0, single = false): CollatorMatchIterator {
-    // split 'query' into grapheme clusters that will be used to find a match in 'text'
+  *#findSlices(input: string, query: string, start = 0, single = false): CollatorMatchIterator {
+    // split 'query' into grapheme clusters that will be used to find a match in 'input'
     const queryGraphemeCount = query ? this.#countSignificantGraphemes(query) : 0
 
     // start searching at specified index (no support for negative indices counting from end!)
-    start = Math.min(text.length, Math.max(0, start))
-    const search = start ? text.slice(start) : text
+    start = Math.min(input.length, Math.max(0, start))
+    const search = start ? input.slice(start) : input
 
     // creates a `CollatorMatch` object
     const makeMatch = (index: number, end = index): CollatorMatch => {
@@ -345,8 +353,8 @@ export class SearchCollator extends Intl.Collator {
 
     // quick escape hatch for empty query strings
     if (!queryGraphemeCount) {
-      // first, yield a match at the beginning of 'text'
-      const index = Math.min(start, text.length)
+      // first, yield a match at the beginning of 'input'
+      const index = Math.min(start, input.length)
       yield { start: index, end: index, text: '' }
       // yield a match after every _significant_ grapheme cluster
       for (const grapheme of this.#visitSignificantGraphemes(search)) {
@@ -377,7 +385,7 @@ export class SearchCollator extends Intl.Collator {
 
     // tries to find a matching grapheme cluster sequence for a grapheme index
     const findMatch = (graphemeIdx: number): CollatorMatch | undefined => {
-      // try sequences with different lengths inside 'text'
+      // try sequences with different lengths inside 'input'
       for (const graphemeCount of this.#yieldMatchGraphemeCounts(queryGraphemeCount)) {
         const match = getMatch(graphemeIdx, graphemeCount)
         if (match && !this.compare(match.text, query)) return match

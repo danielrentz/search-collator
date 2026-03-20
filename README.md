@@ -44,13 +44,13 @@ collator.compare('Größe', 'groesse') // returns 0
 
 The following methods for substring lookup are available:
 
-| Method        | Description                                                                        |
-| ------------- | ---------------------------------------------------------------------------------- |
-| `findMatches` | Creates a lazy iterator for all matches in the search string.                      |
-| `findMatch`   | Returns the first match in the search string (start index, end index, text slice). |
-| `indexOf`     | Returns the start index of the first match in the search string.                   |
-| `includes`    | Returns whether the search string contains a match.                                |
-| `startsWith`  | Returns whether the search string starts with a match.                             |
+| Method        | Description                                                                       |
+| ------------- | --------------------------------------------------------------------------------- |
+| `findMatches` | Creates a lazy iterator for all matches in the input string.                      |
+| `findMatch`   | Returns the first match in the input string (start index, end index, text slice). |
+| `indexOf`     | Returns the start index of the first match in the input string.                   |
+| `includes`    | Returns whether the input string contains a match.                                |
+| `startsWith`  | Returns whether the input string starts with a match.                             |
 
 _Example:_
 
@@ -69,7 +69,7 @@ collator.includes('G r ö ß e', 'oess') // true
 collator.startsWith('G r ö ß e', 'Groess') // true
 
 // it iterates all substrings
-for (const { text, start, end } of collator.findMatches(text, query)) {
+for (const { text, start, end } of collator.findMatches(input, query)) {
   // ...
 }
 ```
@@ -90,10 +90,10 @@ import { SearchCollator } from 'search-collator'
 
 const collator = new SearchCollator('de', { sensitivity: 'base', ignorePunctuation: true })
 
-// tests for equality
+// test for equality
 collator.equals('Größe', 'groesse') // true
 
-// filters array for equal strings
+// filter array for equal strings
 const filter = collator.filter('Größe')
 array.filter(filter)
 array.find(filter)
