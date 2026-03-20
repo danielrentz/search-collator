@@ -2,10 +2,10 @@ import { defineConfig } from 'tsdown'
 
 export default defineConfig({
   entry: 'src/index.ts',
-  format: ['esm', 'cjs'],
+  format: 'esm',
   deps: { skipNodeModulesBundle: true },
   exports: true,
   dts: { tsconfig: 'src/tsconfig.json' },
   publint: true,
-  attw: { level: 'error' },
+  attw: { profile: 'esm-only', level: 'error' },
 })
