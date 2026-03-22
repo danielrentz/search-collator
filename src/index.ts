@@ -210,6 +210,31 @@ export class SearchCollator extends Intl.Collator {
   }
 
   /**
+   * Returns the content and position of a matching substring at the beginning
+   * of the input text according to the collator's locale and options.
+   *
+   * @param input
+   *  The input text to search the substring in.
+   *
+   * @param query
+   *  The substring to be searched in the input text.
+   *
+   * @returns
+   *  The content and position of a matching substring at the beginning of the
+   *  input text.
+   *
+   * @example
+   *  const collator = new SearchCollator('en', { sensitivity: 'base', ignorePunctuation: true })
+   *
+   *  collator.findStartMatch('á.b.c', 'AB')  // { text: 'á.b', start: 0, end: 3 }
+   *  collator.findStartMatch('.á.b.c', 'AB') // { text: 'á.b', start: 1, end: 4 }
+   *  collator.findStartMatch('á.b.c', 'bc')  // undefined
+   */
+  findStartMatch(input: string, query: string): CollatorMatch | undefined {
+    return this.#findSlices(input, query, 0, true).next().value
+  }
+
+  /**
    * Returns whether the input text starts with a substring according to the
    * collator's locale and options.
    *
@@ -226,6 +251,7 @@ export class SearchCollator extends Intl.Collator {
    *  const collator = new SearchCollator('en', { sensitivity: 'base', ignorePunctuation: true })
    *
    *  collator.startsWith('á.b.c', 'AB')  // true (match for 'á.b')
+   *  collator.startsWith('.á.b.c', 'AB') // true (match for 'á.b')
    *  collator.startsWith('á.b.c', 'bc')  // false
    */
   startsWith(input: string, query: string): boolean {
@@ -368,13 +394,12 @@ export class SearchCollator extends Intl.Collator {
 
     // quick escape hatch for empty query strings
     if (!queryGraphemeCount) {
-      // first, yield a match at the beginning of 'input'
-      const index = Math.min(start, input.length)
-      yield { start: index, end: index, text: '' }
-      // yield a match after every _significant_ grapheme cluster
+      // yield a match before every _significant_ grapheme cluster
       for (const grapheme of this.#visitSignificantGraphemes(search)) {
-        yield makeMatch(grapheme.index + grapheme.segment.length)
+        yield makeMatch(grapheme.index)
       }
+      // yield a match at the end of 'input'
+      yield { start: input.length, end: input.length, text: '' }
       return
     }
 
