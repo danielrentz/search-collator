@@ -225,6 +225,29 @@ collator.includes('c.b.á.b.c', 'AB', 6) // false
 collator.includes('c.b.á.b.c', 'ac') // false
 ```
 
+#### Method `SearchCollator::findStartMatch`
+
+Returns the content and position of a matching substring at the beginning of the input text according to the collator's locale and options.
+
+```ts
+findStartMatch(input: string, query: string): CollatorMatch | undefined
+```
+
+| Parameter | Type     | Default    | Description                                     |
+| --------- | -------- | ---------- | ----------------------------------------------- |
+| `input`   | `string` | _required_ | The input text to search the substring in.      |
+| `query`   | `string` | _required_ | The substring to be searched in the input text. |
+
+_Example:_
+
+```ts
+const collator = new SearchCollator('en', { sensitivity: 'base', ignorePunctuation: true })
+
+collator.findStartMatch('á.b.c', 'AB') // { text: 'á.b', start: 0, end: 3 }
+collator.findStartMatch('.á.b.c', 'AB') // { text: 'á.b', start: 1, end: 4 }
+collator.findStartMatch('á.b.c', 'bc') // undefined
+```
+
 #### Method `SearchCollator::startsWith`
 
 Returns whether the input text starts with a substring according to this collator's locale and options.
@@ -244,6 +267,7 @@ _Example:_
 const collator = new SearchCollator('en', { sensitivity: 'base', ignorePunctuation: true })
 
 collator.startsWith('á.b.c', 'AB') // true (match for 'á.b')
+collator.startsWith('.á.b.c', 'AB') // true (match for 'á.b')
 collator.startsWith('á.b.c', 'bc') // false
 ```
 

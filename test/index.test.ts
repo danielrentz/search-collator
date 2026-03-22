@@ -17,9 +17,9 @@ function toPos(pos: PosSpec): Pos {
   return typeof pos === 'number' ? [pos, pos] : pos
 }
 
-function toMatch(text: string, pos: PosSpec): CollatorMatch {
+function toMatch(input: string, pos: PosSpec): CollatorMatch {
   pos = toPos(pos)
-  return { start: pos[0], end: pos[1], text: text.slice(...pos) }
+  return { start: pos[0], end: pos[1], text: input.slice(...pos) }
 }
 
 // ----------------------------------------------------------------------------
@@ -47,7 +47,7 @@ it('should resolve default options', () => {
 
 // ----------------------------------------------------------------------------
 
-type MatchTestSpec = [id: string, locales: Intl.LocalesArgument, options: SearchCollatorOptions, text: string, query: string, expected: PosSpec[], empty?: boolean]
+type MatchTestSpec = [id: string, locales: Intl.LocalesArgument, options: SearchCollatorOptions, input: string, query: string, expected: PosSpec[], empty?: boolean]
 
 const MATCH_TESTS: MatchTestSpec[] = [
   // sensitivity
@@ -70,12 +70,13 @@ const MATCH_TESTS: MatchTestSpec[] = [
   ['E2', 'de', { sensitivity: 'base', ignorePunctuation: true }, '.!.', 'a!b!c', []],
   // empty query string
   ['Q1', 'de', { sensitivity: 'base' }, 'a!b!c', '', [0, 1, 2, 3, 4, 5], true],
-  ['Q2', 'de', { sensitivity: 'base', ignorePunctuation: true }, 'a!b!c', '!!', [0, 1, 3, 5], true],
+  ['Q2', 'de', { sensitivity: 'base', ignorePunctuation: true }, 'a!b!c', '!!', [0, 2, 4, 5], true],
+  ['Q3', 'de', { sensitivity: 'base', ignorePunctuation: true }, '!a!b!', '!!', [1, 3, 5], true],
   ['Q4', 'de', { sensitivity: 'base' }, '', '', [0], true],
-  ['Q4', 'de', { sensitivity: 'base', ignorePunctuation: true }, '.!.', '!!', [0], true],
+  ['Q5', 'de', { sensitivity: 'base', ignorePunctuation: true }, '.!.', '!!', [3], true],
 ]
 
-function expectAllLookupMethods(locales: Intl.LocalesArgument, options: SearchCollatorOptions, args: [text: string, query: string, start?: number], expected: PosSpec[]): void {
+function expectAllLookupMethods(locales: Intl.LocalesArgument, options: SearchCollatorOptions, args: [string, string, number?], expected: PosSpec[]): void {
   const collator = new SearchCollator(locales, options)
   const matches = expected.map((pos) => toMatch(args[0], pos))
   const match0 = matches[0]
@@ -87,26 +88,26 @@ function expectAllLookupMethods(locales: Intl.LocalesArgument, options: SearchCo
 }
 
 describe('should search for matches', () => {
-  it.for(MATCH_TESTS)('case %s', ([, locales, options, text, query, expected]) => {
-    expectAllLookupMethods(locales, options, [text, query], expected)
+  it.for(MATCH_TESTS)('case %s', ([, locales, options, input, query, expected]) => {
+    expectAllLookupMethods(locales, options, [input, query], expected)
     // negative start index will be ignored
-    expectAllLookupMethods(locales, options, [text, query, -2], expected)
+    expectAllLookupMethods(locales, options, [input, query, -2], expected)
   })
 })
 
 describe('should search for matches after start index', () => {
-  it.for(MATCH_TESTS)('case %s', ([, locales, options, text, query, expected, empty]) => {
+  it.for(MATCH_TESTS)('case %s', ([, locales, options, input, query, expected, empty]) => {
     const [skipped = 0, ...rest] = expected
     const start = toPos(skipped)[0] + 1 // start one character after first match
-    if (empty && !rest.length) rest.push(Math.min(start, text.length))
-    expectAllLookupMethods(locales, options, [text, query, start], rest)
+    if (empty && !rest.length) rest.push(Math.min(start, input.length))
+    expectAllLookupMethods(locales, options, [input, query, start], rest)
   })
 })
 
 describe('should search for matches with large start index', () => {
-  it.for(MATCH_TESTS)('case %s', ([, locales, options, text, query, , empty]) => {
-    const expected = empty ? [text.length] : []
-    expectAllLookupMethods(locales, options, [text, query, 1000], expected)
+  it.for(MATCH_TESTS)('case %s', ([, locales, options, input, query, , empty]) => {
+    const expected = empty ? [input.length] : []
+    expectAllLookupMethods(locales, options, [input, query, 1000], expected)
   })
 })
 
@@ -138,15 +139,19 @@ it('should work when shortening grapheme cluster cache', () => {
 // ----------------------------------------------------------------------------
 
 describe('should find match at start of text', () => {
-  it.for(MATCH_TESTS)('case %s', ([, locales, options, text, query, expected]) => {
+  it.for(MATCH_TESTS)('case %s', ([, locales, options, input, query, expected, empty]) => {
     const collator = new SearchCollator(locales, options)
-    const matches = expected.map((pos) => toMatch(text, pos))
-    const match0 = matches[0]
-    const signature = printSignature([text, query], options)
-    expect(collator.startsWith(text, query), `collator.startsWith${signature}`).toBe(match0?.start === 0)
-    for (const match of matches) {
-      const subtext = text.slice(match.start)
-      expect(collator.startsWith(subtext, query), `collator.startsWith${printSignature([subtext, query], options)}`).toBe(true)
+    for (const pos of expected) {
+      const { text, start } = toMatch(input, pos)
+      const expectResults = (slice: string, exp: number) => {
+        const match = (exp >= 0) ? { text, start: exp, end: exp + text.length } : undefined
+        expect(collator.findStartMatch(slice, query), `collator.findStartMatch${printSignature([text, query], options)}`).toStrictEqual(match)
+        expect(collator.startsWith(slice, query), `collator.startsWith${printSignature([text, query], options)}`).toBe(!!match)
+      }
+      const slice = input.slice(start)
+      expectResults(slice, 0)
+      expectResults(`xy${slice}`, empty ? 0 : -1)
+      expectResults(`!!${slice}`, options.ignorePunctuation ? 2 : empty ? 0 : -1)
     }
   })
 })
