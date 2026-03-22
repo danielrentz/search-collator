@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## `1.1.0` – 2026-Mar-22
+
 - Added: method `findStartMatch`
 
 ## `1.0.1` – 2026-Mar-21
