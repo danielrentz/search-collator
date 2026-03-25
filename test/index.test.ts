@@ -47,7 +47,7 @@ it('should resolve default options', () => {
 
 // ----------------------------------------------------------------------------
 
-type MatchTestSpec = [id: string, locales: Intl.LocalesArgument, options: SearchCollatorOptions, input: string, query: string, expected: PosSpec[], empty?: boolean]
+type MatchTestSpec = [id: string, locales: Intl.LocalesArgument, options: SearchCollatorOptions, input: string, query: string, expected: PosSpec[], reverse?: PosSpec[]]
 
 const MATCH_TESTS: MatchTestSpec[] = [
   // sensitivity
@@ -69,14 +69,14 @@ const MATCH_TESTS: MatchTestSpec[] = [
   ['E1', 'de', { sensitivity: 'base' }, '', 'abc', []],
   ['E2', 'de', { sensitivity: 'base', ignorePunctuation: true }, '.!.', 'a!b!c', []],
   // empty query string
-  ['Q1', 'de', { sensitivity: 'base' }, 'a!b!c', '', [0, 1, 2, 3, 4, 5], true],
-  ['Q2', 'de', { sensitivity: 'base', ignorePunctuation: true }, 'a!b!c', '!!', [0, 2, 4, 5], true],
-  ['Q3', 'de', { sensitivity: 'base', ignorePunctuation: true }, '!a!b!', '!!', [1, 3, 5], true],
-  ['Q4', 'de', { sensitivity: 'base' }, '', '', [0], true],
-  ['Q5', 'de', { sensitivity: 'base', ignorePunctuation: true }, '.!.', '!!', [3], true],
+  ['Q1', 'de', { sensitivity: 'base' }, 'a!b!c', '', [0, 1, 2, 3, 4, 5], [5, 4, 3, 2, 1, 0]],
+  ['Q2', 'de', { sensitivity: 'base', ignorePunctuation: true }, 'a!b!c', '!!', [0, 2, 4, 5], [5, 3, 1, 0]],
+  ['Q3', 'de', { sensitivity: 'base', ignorePunctuation: true }, '!a!b!', '!!', [1, 3, 5], [4, 2, 0]],
+  ['Q4', 'de', { sensitivity: 'base' }, '', '', [0], [0]],
+  ['Q5', 'de', { sensitivity: 'base', ignorePunctuation: true }, '.!.', '!!', [3], [0]],
 ]
 
-function expectAllLookupMethods(locales: Intl.LocalesArgument, options: SearchCollatorOptions, args: [string, string, number?], expected: PosSpec[]): void {
+function expectAllMatchMethods(locales: Intl.LocalesArgument, options: SearchCollatorOptions, args: [string, string, number?], expected: PosSpec[]): void {
   const collator = new SearchCollator(locales, options)
   const matches = expected.map((pos) => toMatch(args[0], pos))
   const match0 = matches[0]
@@ -87,27 +87,61 @@ function expectAllLookupMethods(locales: Intl.LocalesArgument, options: SearchCo
   expect(collator.includes(...args), `collator.includes${signature}`).toBe(matches.length > 0)
 }
 
+function expectAllMatchReverseMethods(locales: Intl.LocalesArgument, options: SearchCollatorOptions, args: [string, string, number?], expected: PosSpec[]): void {
+  const collator = new SearchCollator(locales, options)
+  const matches = expected.map((pos) => toMatch(args[0], pos))
+  const match0 = matches[0]
+  const signature = printSignature(args, options)
+  expect(Array.from(collator.findMatchesReverse(...args)), `collator.findMatchesReverse${signature}`).toStrictEqual(matches)
+  expect(collator.findLastMatch(...args), `collator.findLastMatch${signature}`).toStrictEqual(match0)
+  expect(collator.lastIndexOf(...args), `collator.lastIndexOf${signature}`).toBe(match0?.start ?? -1)
+}
+
 describe('should search for matches', () => {
   it.for(MATCH_TESTS)('case %s', ([, locales, options, input, query, expected]) => {
-    expectAllLookupMethods(locales, options, [input, query], expected)
+    expectAllMatchMethods(locales, options, [input, query], expected)
     // negative start index will be ignored
-    expectAllLookupMethods(locales, options, [input, query, -2], expected)
+    expectAllMatchMethods(locales, options, [input, query, -2], expected)
+  })
+})
+
+describe('should search for matches in reversed direction', () => {
+  it.for(MATCH_TESTS)('case %s', ([, locales, options, input, query, expected, reverse = expected.toReversed()]) => {
+    expectAllMatchReverseMethods(locales, options, [input, query], reverse)
+    // large start index will be ignored
+    expectAllMatchReverseMethods(locales, options, [input, query, 1000], reverse)
   })
 })
 
 describe('should search for matches after start index', () => {
-  it.for(MATCH_TESTS)('case %s', ([, locales, options, input, query, expected, empty]) => {
+  it.for(MATCH_TESTS)('case %s', ([, locales, options, input, query, expected, reverse]) => {
     const [skipped = 0, ...rest] = expected
     const start = toPos(skipped)[0] + 1 // start one character after first match
-    if (empty && !rest.length) rest.push(Math.min(start, input.length))
-    expectAllLookupMethods(locales, options, [input, query, start], rest)
+    if (reverse && !rest.length) rest.push(Math.min(start, input.length))
+    expectAllMatchMethods(locales, options, [input, query, start], rest)
+  })
+})
+
+describe('should search for matches before start index', () => {
+  it.for(MATCH_TESTS)('case %s', ([, locales, options, input, query, expected, reverse]) => {
+    const [skipped = 0, ...rest] = reverse ?? expected.toReversed()
+    const start = toPos(skipped)[1] - 1 // start before last match
+    if (reverse && !rest.length) rest.push(0)
+    expectAllMatchReverseMethods(locales, options, [input, query, start], rest)
   })
 })
 
 describe('should search for matches with large start index', () => {
-  it.for(MATCH_TESTS)('case %s', ([, locales, options, input, query, , empty]) => {
-    const expected = empty ? [input.length] : []
-    expectAllLookupMethods(locales, options, [input, query, 1000], expected)
+  it.for(MATCH_TESTS)('case %s', ([, locales, options, input, query, , reverse]) => {
+    const expected = reverse ? [input.length] : []
+    expectAllMatchMethods(locales, options, [input, query, 1000], expected)
+  })
+})
+
+describe('should search for matches with small start index', () => {
+  it.for(MATCH_TESTS)('case %s', ([, locales, options, input, query, , reverse]) => {
+    const expected = reverse ? [0] : []
+    expectAllMatchReverseMethods(locales, options, [input, query, -2], expected)
   })
 })
 
@@ -132,26 +166,46 @@ it('should take tolerance option into account', () => {
 it('should work when shortening grapheme cluster cache', () => {
   const collator = new SearchCollator('de', { sensitivity: 'base' })
   const text = `ee${'a'.repeat(96)}eeee${'a'.repeat(96)}eeee`
-  const result = Array.from(collator.findMatches(text, 'éé'))
-  expect(result).toStrictEqual([0, 98, 99, 100, 198, 199, 200].map((idx) => toMatch(text, [idx, idx + 2])))
+  const result1 = Array.from(collator.findMatches(text, 'éé'))
+  expect(result1).toStrictEqual([0, 98, 99, 100, 198, 199, 200].map((idx) => toMatch(text, [idx, idx + 2])))
+  const result2 = Array.from(collator.findMatchesReverse(text, 'éé'))
+  expect(result2).toStrictEqual([200, 199, 198, 100, 99, 98, 0].map((idx) => toMatch(text, [idx, idx + 2])))
 })
 
 // ----------------------------------------------------------------------------
 
 describe('should find match at start of text', () => {
-  it.for(MATCH_TESTS)('case %s', ([, locales, options, input, query, expected, empty]) => {
+  it.for(MATCH_TESTS)('case %s', ([, locales, options, input, query, expected, reverse]) => {
     const collator = new SearchCollator(locales, options)
     for (const pos of expected) {
       const { text, start } = toMatch(input, pos)
       const expectResults = (slice: string, exp: number) => {
         const match = (exp >= 0) ? { text, start: exp, end: exp + text.length } : undefined
-        expect(collator.findStartMatch(slice, query), `collator.findStartMatch${printSignature([text, query], options)}`).toStrictEqual(match)
-        expect(collator.startsWith(slice, query), `collator.startsWith${printSignature([text, query], options)}`).toBe(!!match)
+        expect(collator.findStartMatch(slice, query), `collator.findStartMatch${printSignature([slice, query], options)}`).toStrictEqual(match)
+        expect(collator.startsWith(slice, query), `collator.startsWith${printSignature([slice, query], options)}`).toBe(!!match)
       }
       const slice = input.slice(start)
       expectResults(slice, 0)
-      expectResults(`xy${slice}`, empty ? 0 : -1)
-      expectResults(`!!${slice}`, options.ignorePunctuation ? 2 : empty ? 0 : -1)
+      expectResults(`xy${slice}`, reverse ? 0 : -1)
+      expectResults(`!!${slice}`, options.ignorePunctuation ? 2 : reverse ? 0 : -1)
+    }
+  })
+})
+
+describe('should find match at end of text', () => {
+  it.for(MATCH_TESTS)('case %s', ([, locales, options, input, query, expected, reverse]) => {
+    const collator = new SearchCollator(locales, options)
+    for (const pos of reverse ?? expected.toReversed()) {
+      const { text, start, end } = toMatch(input, pos)
+      const expectResults = (slice: string, exp: number) => {
+        const match = (exp >= 0) ? { text, start: exp, end: exp + text.length } : undefined
+        expect(collator.findEndMatch(slice, query), `collator.findEndMatch${printSignature([slice, query], options)}`).toStrictEqual(match)
+        expect(collator.endsWith(slice, query), `collator.endsWith${printSignature([slice, query], options)}`).toBe(!!match)
+      }
+      const slice = input.slice(0, end)
+      expectResults(slice, start)
+      expectResults(`${slice}xy`, reverse ? (end + 2) : -1)
+      expectResults(`${slice}!!`, options.ignorePunctuation ? start : reverse ? (end + 2) : -1)
     }
   })
 })
