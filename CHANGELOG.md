@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## `1.2.0` – 2026-Mar-25
+
 - Added: reverse methods `findMatchesReverse`, `findLastMatch`, `lastIndexOf`, `findEndMatch`, `endsWith`
 
 ## `1.1.0` – 2026-Mar-22
