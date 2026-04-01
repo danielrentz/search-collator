@@ -2,13 +2,16 @@
 
 ## Unreleased
 
+- Documentation: Extended `README.md`: TOC and initial example
+- Chore: Bump dev dependencies
+
 ## `1.2.0` – 2026-Mar-25
 
-- Added: reverse methods `findMatchesReverse`, `findLastMatch`, `lastIndexOf`, `findEndMatch`, `endsWith`
+- Added: Reverse methods `findMatchesReverse`, `findLastMatch`, `lastIndexOf`, `findEndMatch`, `endsWith`
 
 ## `1.1.0` – 2026-Mar-22
 
-- Added: method `findStartMatch`
+- Added: Method `findStartMatch`
 
 ## `1.0.1` – 2026-Mar-21
 

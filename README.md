@@ -3,7 +3,24 @@
 [![Publish Package](https://github.com/danielrentz/search-collator/actions/workflows/publish.yml/badge.svg)](https://github.com/danielrentz/search-collator/actions/workflows/publish.yml)
 [![npm version](https://badge.fury.io/js/search-collator.svg?icon=si%3Anpm)](https://badge.fury.io/js/search-collator)
 
+- [Overview](#overview)
+- [Installation](#installation)
+- [Usage](#usage)
+- [How It Works](#how-it-works)
+
+## Overview
+
 This package provides the class `SearchCollator` that extends the class [`Intl.Collator`][1] with methods for searching substrings in a string with locale-aware fuzzy matching.
+
+_Example:_
+
+```ts
+import { SearchCollator } from 'search-collator'
+
+const collator = new SearchCollator('en', { sensitivity: 'base', ignorePunctuation: true })
+
+collator.indexOf('.C.A.F.É.', 'fe') // 5 (match for 'F.É')
+```
 
 Internally, all string comparison operations will be delegated to [`Intl.Collator`][1]'s method `compare` to get the full power of native localized string comparison.
 Class [`Intl.Segmenter`][2] will be used to split all strings into grapheme clusters to optimize searching for match candidates in the search string.
@@ -46,9 +63,9 @@ interface SearchCollatorOptions extends Intl.CollatorOptions {
 }
 ```
 
-| Property                    | Type     | Default | Description                                                                                               |
-| --------------------------- | -------- | ------- | --------------------------------------------------------------------------------------------------------- |
-| `graphemeSequenceTolerance` | `number` | `3`     | Length tolerance for matching substrings in the input text. See chapter 'How It Works' below for details. |
+| Property                    | Type     | Default | Description                                                                                                              |
+| --------------------------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `graphemeSequenceTolerance` | `number` | `3`     | Length tolerance for matching substrings in the input text. See chapter [How It Works](#how-it-works) below for details. |
 
 Due to the purpose of class `SearchCollator`, the default value of the option `usage` is `'search'` (in contrast to `Intl.Collator` that picks `'sort'` by default).
 
