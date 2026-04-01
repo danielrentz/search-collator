@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## `1.2.1` – 2026-Apr-01
+
 - Documentation: Extended `README.md`: TOC and initial example
 - Chore: Bump dev dependencies
 
