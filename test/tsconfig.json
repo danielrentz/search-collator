@@ -1,18 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "..",
-
-  // https://www.typescriptlang.org/tsconfig/#include
-  "include": ["**/*.ts"],
-
-  // https://www.typescriptlang.org/tsconfig/#references
-  "references": [
-    { "path": "../src" },
-  ],
-
-  // https://www.typescriptlang.org/tsconfig/#compiler-options
+  "extends": "@daniel.rentz/build-tools/tsconfig.json",
   "compilerOptions": {
-    "composite": true,
-    "outDir": "../output/test",
-  },
+    "paths": {
+      "@/*": ["../src/*"]
+    }
+  }
 }

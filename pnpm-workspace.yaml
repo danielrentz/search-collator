@@ -1,0 +1,4 @@
+publicHoistPattern:
+  - oxfmt
+  - oxlint
+  - tsdown

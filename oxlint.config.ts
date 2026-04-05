@@ -1,13 +1,3 @@
-import { defineConfig } from 'oxlint'
+import { defineConfig } from '@daniel.rentz/build-tools/oxlint'
 
-export default defineConfig({
-  categories: {
-    correctness: 'error',
-    suspicious: 'error',
-  },
-  options: {
-    reportUnusedDisableDirectives: 'error',
-    typeAware: true,
-    typeCheck: true,
-  },
-})
+export default defineConfig()

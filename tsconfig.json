@@ -1,39 +1,5 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-
-  // https://www.typescriptlang.org/tsconfig/#include
-  "include": ["./*.ts"],
-
-  // https://www.typescriptlang.org/tsconfig/#references
-  "references": [{ "path": "./src" }, { "path": "./test" }],
-
-  // https://www.typescriptlang.org/tsconfig/#compiler-options
-  "compilerOptions": {
-    // type checking
-    "exactOptionalPropertyTypes": true,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noUncheckedIndexedAccess": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "strict": true,
-
-    // modules
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "noUncheckedSideEffectImports": true,
-
-    // emit
-    "noEmitOnError": true,
-    "outDir": "./output",
-
-    // interop constraints
-    "esModuleInterop": true,
-
-    // language and environment
-    "lib": ["ESNext"],
-    "target": "esnext"
-  }
+  "extends": "@daniel.rentz/build-tools/tsconfig.json",
+  "include": ["./*.ts"]
 }

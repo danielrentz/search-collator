@@ -3,7 +3,7 @@ name: Publish
 on:
   push:
     tags:
-      - "v*" # publish when pushing a tag starting with 'v'
+      - 'v*' # publish when pushing a tag starting with 'v'
 
 permissions:
   id-token: write # required for OIDC
@@ -17,7 +17,7 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: "24"
+          node-version: '24'
           registry-url: https://registry.npmjs.org
 
       - uses: pnpm/action-setup@v5

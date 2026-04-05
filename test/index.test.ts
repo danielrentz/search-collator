@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { type CollatorMatch, type SearchCollatorOptions, SearchCollator } from '../src/index.js'
+import { type CollatorMatch, type SearchCollatorOptions, SearchCollator } from '@/index'
 
 function printValue(value: unknown): string {
   return typeof value === 'string' ? `'${value}'` : String(value)
 }
 
 function printSignature(args: unknown[], options: SearchCollatorOptions): string {
-  const optstr = Object.entries(options).map(([key, value]) => `${key}: ${printValue(value)}`).join(', ')
+  const optstr = Object.entries(options)
+    .map(([key, value]) => `${key}: ${printValue(value)}`)
+    .join(', ')
   return `(${args.map(printValue).join(', ')}) with { ${optstr} }`
 }
 
@@ -49,6 +51,7 @@ it('should resolve default options', () => {
 
 type MatchTestSpec = [id: string, locales: Intl.LocalesArgument, options: SearchCollatorOptions, input: string, query: string, expected: PosSpec[], reverse?: PosSpec[]]
 
+// oxfmt-ignore
 const MATCH_TESTS: MatchTestSpec[] = [
   // sensitivity
   ['S1', 'de', { sensitivity: 'base' }, 'Große GROẞE G.r.ö.ß.e Grüße Größe GRÖẞE Groesse GROESSE', 'ROESSE', [[29, 33], [35, 39], [41, 47], [49, 55]]],
@@ -180,7 +183,7 @@ describe('should find match at start of text', () => {
     for (const pos of expected) {
       const { text, start } = toMatch(input, pos)
       const expectResults = (slice: string, exp: number) => {
-        const match = (exp >= 0) ? { text, start: exp, end: exp + text.length } : undefined
+        const match = exp >= 0 ? { text, start: exp, end: exp + text.length } : undefined
         expect(collator.findStartMatch(slice, query), `collator.findStartMatch${printSignature([slice, query], options)}`).toStrictEqual(match)
         expect(collator.startsWith(slice, query), `collator.startsWith${printSignature([slice, query], options)}`).toBe(!!match)
       }
@@ -198,14 +201,14 @@ describe('should find match at end of text', () => {
     for (const pos of reverse ?? expected.toReversed()) {
       const { text, start, end } = toMatch(input, pos)
       const expectResults = (slice: string, exp: number) => {
-        const match = (exp >= 0) ? { text, start: exp, end: exp + text.length } : undefined
+        const match = exp >= 0 ? { text, start: exp, end: exp + text.length } : undefined
         expect(collator.findEndMatch(slice, query), `collator.findEndMatch${printSignature([slice, query], options)}`).toStrictEqual(match)
         expect(collator.endsWith(slice, query), `collator.endsWith${printSignature([slice, query], options)}`).toBe(!!match)
       }
       const slice = input.slice(0, end)
       expectResults(slice, start)
-      expectResults(`${slice}xy`, reverse ? (end + 2) : -1)
-      expectResults(`${slice}!!`, options.ignorePunctuation ? start : reverse ? (end + 2) : -1)
+      expectResults(`${slice}xy`, reverse ? end + 2 : -1)
+      expectResults(`${slice}!!`, options.ignorePunctuation ? start : reverse ? end + 2 : -1)
     }
   })
 })
@@ -214,6 +217,7 @@ describe('should find match at end of text', () => {
 
 type EqualsTestSpec = [id: string, locales: Intl.LocalesArgument, options: SearchCollatorOptions, text1: string, texts2: string[], expected: boolean]
 
+// oxfmt-ignore
 const EQUAL_TESTS: EqualsTestSpec[] = [
   // sensitivity
   ['S1', 'de', { sensitivity: 'base' }, 'Größe', ['Größe', 'GRÖẞE', 'Groesse', 'GROESSE'], true],

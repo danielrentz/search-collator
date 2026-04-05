@@ -1,8 +1,3 @@
-import { defineConfig } from 'oxfmt'
+import { defineConfig } from '@daniel.rentz/build-tools/oxfmt'
 
-export default defineConfig({
-  ignorePatterns: ['test/**/*'],
-  printWidth: 320,
-  semi: false,
-  singleQuote: true,
-})
+export default defineConfig()

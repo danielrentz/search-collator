@@ -1,11 +1,3 @@
-import { defineConfig } from 'tsdown'
+import { defineConfig } from '@daniel.rentz/build-tools/tsdown'
 
-export default defineConfig({
-  entry: 'src/index.ts',
-  format: 'esm',
-  deps: { skipNodeModulesBundle: true },
-  exports: true,
-  dts: { tsconfig: 'src/tsconfig.json' },
-  publint: true,
-  attw: { profile: 'esm-only', level: 'error' },
-})
+export default defineConfig()
