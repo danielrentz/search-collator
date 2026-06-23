@@ -156,7 +156,7 @@ export function* findMatches(collator: Intl.Collator, input: string, query: stri
       const match = makeMatch(input, graphemePositions[idx1]![0], graphemePositions[idx2]![1])
       if (match && !collator.compare(match.text, query)) return match
     }
-    return
+    return undefined
   }
 
   // try first index only for boundary mode (implementation for 'startsWith' and 'endsWith')
