@@ -1,9 +1,12 @@
 name: Publish
 
 on:
+  workflow_run:
+    workflows: [Verify]
+    branches: [main]
+    types: [completed]
   push:
-    tags:
-      - 'v*' # publish when pushing a tag starting with 'v'
+    tags: ["v*"] # publish when pushing a tag starting with 'v'
 
 permissions:
   id-token: write # required for OIDC
@@ -13,11 +16,11 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v6
         with:
-          node-version: '24'
+          node-version: 24
           registry-url: https://registry.npmjs.org
 
       - uses: pnpm/action-setup@v5
