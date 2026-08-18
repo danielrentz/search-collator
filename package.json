@@ -27,15 +27,11 @@
     "type": "git",
     "url": "git+https://github.com/danielrentz/search-collator.git"
   },
-  "type": "module",
-  "engines": {
-    "node": "^22.18.0 || >=24.11.0"
-  },
-  "packageManager": "pnpm@11.8.0",
   "files": [
     "CHANGELOG.md",
     "dist/"
   ],
+  "type": "module",
   "exports": {
     ".": "./dist/index.mjs",
     "./package.json": "./package.json"
@@ -50,9 +46,15 @@
     "verify": "pnpm audit && pnpm peers check && pnpm build && pnpm lint && pnpm test"
   },
   "devDependencies": {
-    "@daniel.rentz/build-tools": "^0.0.4",
-    "@types/node": "^22.20.0",
-    "@vitest/coverage-v8": "^4.1.9",
-    "vitest": "^4.1.9"
-  }
+    "@daniel.rentz/build-tools": "^0.0.6",
+    "@vitest/coverage-v8": "^4.1.10",
+    "oxfmt": "^0.63.0",
+    "oxlint": "^1.78.0",
+    "tsdown": "^0.22.14",
+    "vitest": "^4.1.10"
+  },
+  "engines": {
+    "node": "^22.18.0 || >=24.11.0"
+  },
+  "packageManager": "pnpm@11.22.0"
 }

@@ -36,13 +36,13 @@ function* yieldGraphemes(options: Intl.ResolvedCollatorOptions, text: string, st
   // visit the segments in correct order using `segments.containing` to be able
   // to start at an arbitrary position, ignore partially covered first segment
   if (reverse) {
-    for (let index = start; index > 0; ) {
+    for (let index = start; index > 0;) {
       const data = segments.containing(index - 1)!
       if (data.index + data.segment.length === index) yield data
       index = data.index
     }
   } else {
-    for (let index = start; index < text.length; ) {
+    for (let index = start; index < text.length;) {
       const data = segments.containing(index)!
       if (data.index === index) yield data
       index = data.index + data.segment.length

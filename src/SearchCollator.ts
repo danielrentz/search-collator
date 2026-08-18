@@ -1,4 +1,4 @@
-import { CollatorMatch, CollatorMatchIterator } from './findMatches.js'
+import type { CollatorMatch, CollatorMatchIterator } from './findMatches.js'
 import { findMatches } from './findMatches.js'
 
 /**

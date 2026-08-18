@@ -1,5 +1,2 @@
-publicHoistPattern:
-  - oxfmt
-  - oxlint
-  - oxlint-tsgolint
-  - tsdown
+minimumReleaseAgeExclude:
+  - '@daniel.rentz/*'
