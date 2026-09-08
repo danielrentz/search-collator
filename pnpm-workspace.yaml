@@ -1,2 +1,5 @@
 minimumReleaseAgeExclude:
   - '@daniel.rentz/*'
+
+publicHoistPattern:
+  - oxlint-tsgolint
