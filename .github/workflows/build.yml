@@ -12,25 +12,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Setup pnpm and nodejs
-        uses: pnpm/setup@v2
-        with:
-          runtime: node@24
-
-      - run: pnpm audit
-      - run: pnpm peers check
-      - run: pnpm build
-      - run: pnpm lint
-      - run: pnpm test
+      - name: Build package
+        uses: danielrentz/build-tools/.github/actions/pnpm-build@main
 
       - name: Publish package
         if: startsWith(github.event.ref, 'refs/tags/v')
-        run: |
-          TAG="${GITHUB_REF#refs/tags/}"
-          TAG_VERSION="${TAG#v}"
-          FILE_VERSION=$(node -p "require('./package.json').version")
-          if [ "$TAG_VERSION" != "$FILE_VERSION" ]; then
-            echo "Version mismatch: tag=$TAG_VERSION, package.json=$FILE_VERSION"
-            exit 1
-          fi
-          pnpm publish --access public --provenance --no-git-checks
+        uses: danielrentz/build-tools/.github/actions/npm-publish@main
