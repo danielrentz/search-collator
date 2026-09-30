@@ -127,7 +127,8 @@ export class SearchCollator extends Intl.Collator {
    *
    * @param start
    *  The code unit index of the character in the input text to start searching
-   *  at (matches will start before this position). Default is `input.length`.
+   *  backwards at (matches will start at or before this position, like the
+   *  native method `String::lastIndexOf`). Default is `input.length`.
    *
    * @returns
    *  An iterator yielding the content and positions of all occurrences of the
@@ -186,7 +187,8 @@ export class SearchCollator extends Intl.Collator {
    *
    * @param start
    *  The code unit index of the character in the input text to start searching
-   *  at (matches will start before this position). Default is `input.length`.
+   *  backwards at (matches will start at or before this position, like the
+   *  native method `String::lastIndexOf`). Default is `input.length`.
    *
    * @returns
    *  The content and position of the last occurrence of the query string in
@@ -196,8 +198,9 @@ export class SearchCollator extends Intl.Collator {
    *  const collator = new SearchCollator('en', { sensitivity: 'base', ignorePunctuation: true })
    *
    *  collator.findLastMatch('.c.a.f.é.C.A.F.É.', 'fe')     // { text: 'F.É', start: 13, end: 16 }
-   *  collator.findLastMatch('.c.a.f.é.C.A.F.É.', 'fe', 13) // { text: 'f.é', start: 5, end: 8 }
-   *  collator.findLastMatch('.c.a.f.é.C.A.F.É.', 'fe', 5)  // undefined
+   *  collator.findLastMatch('.c.a.f.é.C.A.F.É.', 'fe', 13) // { text: 'F.É', start: 13, end: 16 }
+   *  collator.findLastMatch('.c.a.f.é.C.A.F.É.', 'fe', 12) // { text: 'f.é', start: 5, end: 8 }
+   *  collator.findLastMatch('.c.a.f.é.C.A.F.É.', 'fe', 4)  // undefined
    */
   findLastMatch(input: string, query: string, start?: number): CollatorMatch | undefined {
     return findMatches(this, input, query, this.#tolerance, start, true).next().value
@@ -243,7 +246,8 @@ export class SearchCollator extends Intl.Collator {
    *
    * @param start
    *  The code unit index of the character in the input text to start searching
-   *  at (matches will start before this position). Default is `input.length`.
+   *  backwards at (matches will start at or before this position, like the
+   *  native method `String::lastIndexOf`). Default is `input.length`.
    *
    * @returns
    *  The index of the last occurrence of the query string in the input text.
@@ -252,8 +256,9 @@ export class SearchCollator extends Intl.Collator {
    *  const collator = new SearchCollator('en', { sensitivity: 'base', ignorePunctuation: true })
    *
    *  collator.lastIndexOf('.c.a.f.é.C.A.F.É.', 'fe')     // 13 (match for 'F.É')
-   *  collator.lastIndexOf('.c.a.f.é.C.A.F.É.', 'fe', 13) // 5 (match for 'f.é')
-   *  collator.lastIndexOf('.c.a.f.é.C.A.F.É.', 'fe', 5)  // -1
+   *  collator.lastIndexOf('.c.a.f.é.C.A.F.É.', 'fe', 13) // 13 (match for 'F.É')
+   *  collator.lastIndexOf('.c.a.f.é.C.A.F.É.', 'fe', 12) // 5 (match for 'f.é')
+   *  collator.lastIndexOf('.c.a.f.é.C.A.F.É.', 'fe', 4)  // -1
    */
   lastIndexOf(input: string, query: string, start?: number): number {
     return findMatches(this, input, query, this.#tolerance, start, true).next().value?.start ?? -1
@@ -432,7 +437,7 @@ export class SearchCollator extends Intl.Collator {
    *  const array = ['CAFÉ', 'C.A.F.É', 'K.A.F.É']
    *  array.filter(filter)      // ['CAFÉ', 'C.A.F.É']
    *  array.find(filter)        // 'CAFÉ'
-   *  array.lastIndexOf(filter) // 1
+   *  array.findLastIndex(filter) // 1
    *
    *  // or inline
    *  array.filter(collator.filter('cafe'))

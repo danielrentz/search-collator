@@ -114,12 +114,52 @@ function* yieldMatchGraphemeCounts(query: number, remain: number, tolerance: num
  * Yields the positions of all matching substrings in an input text according
  * to the settings of the passed collator. Explicitly supports the collator
  * option 'ignorePunctuation'.
+ *
+ * Low-level implementation of all search methods of class `SearchCollator`
+ * that can be used with any instance of `Intl.Collator`.
+ *
+ * @param collator
+ *  The collator used to compare the substrings of the input text with the
+ *  query string. Should be created with option `usage: 'search'`.
+ *
+ * @param input
+ *  The input text to search the substring in.
+ *
+ * @param query
+ *  The substring to be searched in the input text.
+ *
+ * @param tolerance
+ *  Length tolerance for matching substrings in the input text (see option
+ *  `graphemeSequenceTolerance` of class `SearchCollator`).
+ *
+ * @param start
+ *  The code unit index of the character in the input text to start searching
+ *  at. Default is `0` in forward mode, and `input.length` in reverse mode
+ *  (matches will start at or before this position, like the native method
+ *  `String::lastIndexOf`).
+ *
+ * @param reverse
+ *  Whether to search backwards through the input text. Default is `false`.
+ *
+ * @param boundary
+ *  Whether to yield a match at the beginning (reverse mode: at the end) of the
+ *  input text only. Default is `false`.
+ *
+ * @returns
+ *  An iterator yielding the content and positions of all occurrences of the
+ *  query string in the input text.
+ *
+ * @example
+ *  const collator = new Intl.Collator('en', { usage: 'search', sensitivity: 'base', ignorePunctuation: true })
+ *
+ *  for (const match of findMatches(collator, '.C.A.F.É.c.a.f.é.', 'fe', 3)) {
+ *    // 1st match: { text: 'F.É', start: 5, end: 8 }
+ *    // 2nd match: { text: 'f.é', start: 13, end: 16 }
+ *  }
  */
 export function* findMatches(collator: Intl.Collator, input: string, query: string, tolerance: number, start?: number, reverse?: boolean, boundary?: boolean): CollatorMatchIterator {
   // start searching at specified index (no support for negative indices counting from end!)
   start = Math.min(input.length, Math.max(0, start ?? (reverse ? input.length : 0)))
-  // iterator for significant grapheme clusters in input text
-  const graphemesIter = yieldSignificantGraphemePositions(collator, input, start, reverse)
 
   // split 'query' into grapheme clusters that will be used to find a match in 'input'
   const queryGraphemeCount = countSignificantGraphemes(collator, query)
@@ -127,17 +167,31 @@ export function* findMatches(collator: Intl.Collator, input: string, query: stri
   if (!queryGraphemeCount) {
     // yield a match before every _significant_ grapheme cluster (reverse mode: after each)
     const posIdx = reverse ? 1 : 0
-    for (const position of graphemesIter) yield makeMatch(input, position[posIdx])
+    for (const position of yieldSignificantGraphemePositions(collator, input, start, reverse)) yield makeMatch(input, position[posIdx])
     // yield a match at the end of 'input' (reverse mode: at the beginning)
     yield makeMatch(input, reverse ? 0 : input.length)
     return
   }
 
-  // buffer for already known grapheme clusters extracted from input text
-  const graphemePositions: GraphemePosition[] = []
   // minimum and maximum number of graphemes to be fetched from input text
   const minGraphemeCount = Math.max(1, queryGraphemeCount - tolerance)
   const maxGraphemeCount = queryGraphemeCount + tolerance
+
+  // reverse mode: like `String#lastIndexOf`, matches may start at the start index but end after it,
+  // therefore start fetching grapheme clusters behind the maximum possible end of such a match
+  let iterStart = start
+  if (reverse) {
+    let count = 0
+    for (const [, end] of yieldSignificantGraphemePositions(collator, input, start)) {
+      iterStart = end
+      if ((count += 1) === maxGraphemeCount) break
+    }
+  }
+
+  // iterator for significant grapheme clusters in input text
+  const graphemesIter = yieldSignificantGraphemePositions(collator, input, iterStart, reverse)
+  // buffer for already known grapheme clusters extracted from input text
+  const graphemePositions: GraphemePosition[] = []
 
   // tries to find a matching grapheme cluster sequence for a grapheme index
   const findMatch = (graphemeIdx: number): CollatorMatch | undefined => {
@@ -154,7 +208,8 @@ export function* findMatches(collator: Intl.Collator, input: string, query: stri
       const idx1 = reverse ? lastGraphemeIdx : graphemeIdx
       const idx2 = reverse ? graphemeIdx : lastGraphemeIdx
       const match = makeMatch(input, graphemePositions[idx1]![0], graphemePositions[idx2]![1])
-      if (match && !collator.compare(match.text, query)) return match
+      // reverse mode: skip matches starting after the start index (see above)
+      if ((!reverse || match.start <= start) && !collator.compare(match.text, query)) return match
     }
     return undefined
   }

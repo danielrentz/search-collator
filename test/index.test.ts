@@ -128,9 +128,32 @@ describe('should search for matches after start index', () => {
 describe('should search for matches before start index', () => {
   it.for(MATCH_TESTS)('case %s', ([, locales, options, input, query, expected, reverse]) => {
     const [skipped = 0, ...rest] = reverse ?? expected.toReversed()
-    const start = toPos(skipped)[1] - 1 // start before last match
+    const start = toPos(skipped)[0] - 1 // start one character before last match
     if (reverse && !rest.length) rest.push(0)
     expectAllMatchReverseMethods(locales, options, [input, query, start], rest)
+  })
+})
+
+describe('should search for matches at start index', () => {
+  it.for(MATCH_TESTS)('case %s', ([, locales, options, input, query, expected, reverse = expected.toReversed()]) => {
+    // like native string methods, a match starting exactly at the start index will be found in both directions
+    const start1 = expected.length ? toPos(expected[0]!)[0] : 0
+    expectAllMatchMethods(locales, options, [input, query, start1], expected)
+    const start2 = reverse.length ? toPos(reverse[0]!)[0] : 0
+    expectAllMatchReverseMethods(locales, options, [input, query, start2], reverse)
+  })
+})
+
+describe('should behave like native string methods for start index', () => {
+  const collator = new SearchCollator('en', { sensitivity: 'variant' })
+  const input = 'abcabcab'
+  it.for(['abc', 'ab', 'b', 'bca', ''])("query '%s'", (query) => {
+    for (let start = -2; start <= input.length + 2; start += 1) {
+      const signature = printSignature([input, query, start], {})
+      expect(collator.indexOf(input, query, start), `collator.indexOf${signature}`).toBe(input.indexOf(query, start))
+      expect(collator.lastIndexOf(input, query, start), `collator.lastIndexOf${signature}`).toBe(input.lastIndexOf(query, start))
+      expect(collator.includes(input, query, start), `collator.includes${signature}`).toBe(input.includes(query, start))
+    }
   })
 })
 
