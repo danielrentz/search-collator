@@ -1,12 +1,13 @@
 # search-collator
 
-[![Publish Package](https://github.com/danielrentz/search-collator/actions/workflows/publish.yml/badge.svg)](https://github.com/danielrentz/search-collator/actions/workflows/publish.yml)
+[![Build](https://github.com/danielrentz/search-collator/actions/workflows/build.yml/badge.svg)](https://github.com/danielrentz/search-collator/actions/workflows/build.yml)
 [![npm version](https://badge.fury.io/js/search-collator.svg?icon=si%3Anpm)](https://badge.fury.io/js/search-collator)
 
 - [Overview](#overview)
 - [Installation](#installation)
 - [Usage](#usage)
 - [How It Works](#how-it-works)
+- [References](#references)
 
 ## Overview
 
@@ -114,7 +115,7 @@ _Example:_
 const collator = new SearchCollator('en', { sensitivity: 'base', ignorePunctuation: true })
 
 collator.resolvedOptions()
-// returns { locales: 'en', usage: 'search', sensitivity: 'base', graphemeSequenceTolerance: 3, ... }
+// returns { locale: 'en', usage: 'search', sensitivity: 'base', graphemeSequenceTolerance: 3, ... }
 ```
 
 ### Search for Substrings
@@ -178,11 +179,11 @@ Returns an iterator yielding the content and positions of all occurrences of a s
 findMatchesReverse(input: string, query: string, start?: number): CollatorMatchIterator
 ```
 
-| Parameter | Type     | Default        | Description                                                                                                             |
-| --------- | -------- | -------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `input`   | `string` | _required_     | The input text to search the substring in.                                                                              |
-| `query`   | `string` | _required_     | The substring to be searched in the input text.                                                                         |
-| `start`   | `number` | `input.length` | The code unit index of the character in the input text to start searching at (matches will start before this position). |
+| Parameter | Type     | Default        | Description                                                                                                                                                                           |
+| --------- | -------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `input`   | `string` | _required_     | The input text to search the substring in.                                                                                                                                            |
+| `query`   | `string` | _required_     | The substring to be searched in the input text.                                                                                                                                       |
+| `start`   | `number` | `input.length` | The code unit index of the character in the input text to start searching backwards at (matches will start at or before this position, like the native method `String::lastIndexOf`). |
 
 _Example:_
 
@@ -227,11 +228,11 @@ Returns the content and position of the last occurrence of a substring in the in
 findLastMatch(input: string, query: string, start?: number): CollatorMatch | undefined
 ```
 
-| Parameter | Type     | Default        | Description                                                                                                             |
-| --------- | -------- | -------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `input`   | `string` | _required_     | The input text to search the substring in.                                                                              |
-| `query`   | `string` | _required_     | The substring to be searched in the input text.                                                                         |
-| `start`   | `number` | `input.length` | The code unit index of the character in the input text to start searching at (matches will start before this position). |
+| Parameter | Type     | Default        | Description                                                                                                                                                                           |
+| --------- | -------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `input`   | `string` | _required_     | The input text to search the substring in.                                                                                                                                            |
+| `query`   | `string` | _required_     | The substring to be searched in the input text.                                                                                                                                       |
+| `start`   | `number` | `input.length` | The code unit index of the character in the input text to start searching backwards at (matches will start at or before this position, like the native method `String::lastIndexOf`). |
 
 _Example:_
 
@@ -239,8 +240,9 @@ _Example:_
 const collator = new SearchCollator('en', { sensitivity: 'base', ignorePunctuation: true })
 
 collator.findLastMatch('.c.a.f.é.C.A.F.É.', 'fe') // { text: 'F.É', start: 13, end: 16 }
-collator.findLastMatch('.c.a.f.é.C.A.F.É.', 'fe', 13) // { text: 'f.é', start: 5, end: 8 }
-collator.findLastMatch('.c.a.f.é.C.A.F.É.', 'fe', 5) // undefined
+collator.findLastMatch('.c.a.f.é.C.A.F.É.', 'fe', 13) // { text: 'F.É', start: 13, end: 16 }
+collator.findLastMatch('.c.a.f.é.C.A.F.É.', 'fe', 12) // { text: 'f.é', start: 5, end: 8 }
+collator.findLastMatch('.c.a.f.é.C.A.F.É.', 'fe', 4) // undefined
 ```
 
 #### Method `SearchCollator::indexOf`
@@ -275,11 +277,11 @@ Returns the character index of the last occurrence of a substring in the input t
 lastIndexOf(input: string, query: string, start?: number): number
 ```
 
-| Parameter | Type     | Default        | Description                                                                                                             |
-| --------- | -------- | -------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `input`   | `string` | _required_     | The input text to search the substring in.                                                                              |
-| `query`   | `string` | _required_     | The substring to be searched in the input text.                                                                         |
-| `start`   | `number` | `input.length` | The code unit index of the character in the input text to start searching at (matches will start before this position). |
+| Parameter | Type     | Default        | Description                                                                                                                                                                           |
+| --------- | -------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `input`   | `string` | _required_     | The input text to search the substring in.                                                                                                                                            |
+| `query`   | `string` | _required_     | The substring to be searched in the input text.                                                                                                                                       |
+| `start`   | `number` | `input.length` | The code unit index of the character in the input text to start searching backwards at (matches will start at or before this position, like the native method `String::lastIndexOf`). |
 
 _Example:_
 
@@ -287,8 +289,9 @@ _Example:_
 const collator = new SearchCollator('en', { sensitivity: 'base', ignorePunctuation: true })
 
 collator.lastIndexOf('.c.a.f.é.C.A.F.É.', 'fe') // 13 (match for 'F.É')
-collator.lastIndexOf('.c.a.f.é.C.A.F.É.', 'fe', 13) // 5 (match for 'f.é')
-collator.lastIndexOf('.c.a.f.é.C.A.F.É.', 'fe', 5) // -1
+collator.lastIndexOf('.c.a.f.é.C.A.F.É.', 'fe', 13) // 13 (match for 'F.É')
+collator.lastIndexOf('.c.a.f.é.C.A.F.É.', 'fe', 12) // 5 (match for 'f.é')
+collator.lastIndexOf('.c.a.f.é.C.A.F.É.', 'fe', 4) // -1
 ```
 
 #### Method `SearchCollator::includes`
@@ -444,7 +447,7 @@ filter(input1: string): (input2: string) => boolean
 
 _Example:_
 
-```js
+```ts
 const collator = new SearchCollator('en', { sensitivity: 'base', ignorePunctuation: true })
 
 const filter = collator.filter('cafe')
@@ -456,10 +459,48 @@ filter('K.A.F.É') // false
 const array = ['CAFÉ', 'C.A.F.É', 'K.A.F.É']
 array.filter(filter) // ['CAFÉ', 'C.A.F.É']
 array.find(filter) // 'CAFÉ'
-array.lastIndexOf(filter) // 1
+array.findLastIndex(filter) // 1
 
 // or inline
 array.filter(collator.filter('cafe'))
+```
+
+### Low-Level API
+
+#### Function `findMatches`
+
+Returns an iterator yielding the content and positions of all occurrences of a substring in the input text according to the passed collator's locale and options.
+
+This is the low-level implementation of all search methods of class `SearchCollator`. It can be used with any instance of [`Intl.Collator`][1], e.g. to search with an existing collator without creating a `SearchCollator`.
+
+```ts
+function findMatches(collator: Intl.Collator, input: string, query: string, tolerance: number, start?: number, reverse?: boolean, boundary?: boolean): CollatorMatchIterator
+```
+
+| Parameter   | Type            | Default                            | Description                                                                                                                                            |
+| ----------- | --------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `collator`  | `Intl.Collator` | _required_                         | The collator used to compare substrings of the input text with the query string. Should be created with option `usage: 'search'`.                      |
+| `input`     | `string`        | _required_                         | The input text to search the substring in.                                                                                                             |
+| `query`     | `string`        | _required_                         | The substring to be searched in the input text.                                                                                                        |
+| `tolerance` | `number`        | _required_                         | Length tolerance for matching substrings in the input text (see option [`graphemeSequenceTolerance`](#interface-searchcollatoroptions)).               |
+| `start`     | `number`        | `0` (reverse mode: `input.length`) | The code unit index of the character in the input text to start searching at. Same behavior as for the methods `findMatches` and `findMatchesReverse`. |
+| `reverse`   | `boolean`       | `false`                            | Whether to search backwards through the input text (like method `findMatchesReverse`).                                                                 |
+| `boundary`  | `boolean`       | `false`                            | Whether to find a match at the beginning of the input text only (reverse mode: at the end), like methods `findStartMatch` and `findEndMatch`.          |
+
+_Example:_
+
+```ts
+import { findMatches } from 'search-collator'
+
+const collator = new Intl.Collator('en', { usage: 'search', sensitivity: 'base', ignorePunctuation: true })
+
+for (const match of findMatches(collator, '.C.A.F.É.c.a.f.é.', 'fe', 3)) {
+  // 1st match: { text: 'F.É', start: 5, end: 8 }
+  // 2nd match: { text: 'f.é', start: 13, end: 16 }
+}
+
+findMatches(collator, '.C.A.F.É.c.a.f.é.', 'fe', 3, undefined, true).next().value // { text: 'f.é', start: 13, end: 16 }
+findMatches(collator, '.C.A.F.É.c.a.f.é.', 'cafe', 3, undefined, false, true).next().value // { text: 'C.A.F.É', start: 1, end: 8 }
 ```
 
 ## How It Works
@@ -473,7 +514,7 @@ More precisely, the search algorithm splits the strings by [grapheme clusters][3
 
 > _Example:_ The string `déjà-vu` (7 code units) can be rewritten as `de\u0301ja\u0300-vu` (9 code units) with the characters U+0301 COMBINING ACUTE ACCENT and U+0300 COMBINING GRAVE ACCENT.
 > The character sequences `e\u0301` and `a\u0300` are considered single grapheme clusters representing the characters `é` and `à` respectively.
-> Internally, the search algorithm uses an [`Intl.Segmenter`][2] to be able to extract the grapheme cluster sequences `de\u0301`, `e\u0301j`, `j\u0300`, and so on, and the collator will find a match for `ej` and `e\u0301j`.
+> Internally, the search algorithm uses an [`Intl.Segmenter`][2] to be able to extract the grapheme cluster sequences `de\u0301`, `e\u0301j`, `ja\u0300`, and so on, and the collator will find a match for `ej` and `e\u0301j`.
 
 ### Grapheme Cluster Sequences (Option `graphemeSequenceTolerance`)
 
@@ -485,7 +526,7 @@ Or, if the collator is set to `numeric` mode, numbers like `1` will match longer
 To be able to find these matches when searching in the input string, the search algorithm will extract substring candidates with different lengths.
 
 - First, the number of grapheme clusters in the query string will be counted.
-- Next, for every start position in the input text, these number of grapheme clusters will be extracted.
+- Next, for every start position in the input text, this number of grapheme clusters will be extracted.
 - If that substring does not match, the search algorithm will try sequences with one more grapheme cluster, and one less grapheme cluster.
 - This will be repeated up to a maximum distance (by default, 3 more or less grapheme clusters).
 
@@ -496,7 +537,7 @@ However, the higher this number, the slower the search algorithm will run.
 >
 > - Try to find matches at code unit index 0:
 >   - `Größ` (4 grapheme clusters)
->   - `Grö` and `Größe` (one more and one less)
+>   - `Grö` and `Größe` (one less and one more)
 >   - `Gr` (two less - two more is not possible)
 >   - `G` (three less)
 > - Try to find matches at code unit index 1:
