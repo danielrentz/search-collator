@@ -46,9 +46,9 @@
     "verify": "pnpm audit && pnpm peers check && pnpm build && pnpm lint && pnpm test"
   },
   "devDependencies": {
-    "@daniel.rentz/build-tools": "^0.0.9",
-    "@vitest/coverage-v8": "^5.0.0",
-    "vitest": "^5.0.0"
+    "@daniel.rentz/build-tools": "^0.0.11",
+    "@vitest/coverage-v8": "^5.0.5",
+    "vitest": "^5.0.5"
   },
   "engines": {
     "node": "^22.18.0 || >=24.11.0"
